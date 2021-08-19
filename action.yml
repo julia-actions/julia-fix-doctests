@@ -48,7 +48,7 @@ runs:
     - uses: codecov/codecov-action@v1
       with:
         file: lcov.info
-        token: ${{ codecov-token }}
+        token: ${{ inputs.codecov-token }}
     - uses: reviewdog/action-suggester@v1
       # `if` not supported yet?
       # if: github.event_name == 'pull_request'
