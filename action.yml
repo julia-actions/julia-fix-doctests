@@ -19,7 +19,7 @@ inputs:
     description: 'Version of Julia to use'
     required: false
     default: '1'
-  fail-on-error:
+  fail_on_error:
     description: 'Whether or not to fail the check if the doctests fail'
     required: false
     default: 'true'
@@ -54,5 +54,5 @@ runs:
       # if: github.event_name == 'pull_request'
       with:
         tool_name: Documenter (doctests)
-        fail_on_error: ${{ inputs.fail-on-error }}
+        fail_on_error: ${{ inputs.fail_on_error }}
         filter_mode: ${{ inputs.filter_mode }}
