@@ -38,6 +38,13 @@ runs:
     - name: Fix doctests
       shell: julia --code-coverage --project=docs {0}
       run: |
+        ENV["GITHUB_EVENT_NAME"] == "pull_request" || error("""
+        `julia-doctest` can only be run on pull requests! Use
+        ```
+        on: [pull_request]
+        ```
+        to only trigger your workflow on pull requests.
+        """)
         using Pkg
         Pkg.develop(PackageSpec(path=pwd()))
         Pkg.instantiate()
@@ -50,8 +57,6 @@ runs:
         file: lcov.info
         token: ${{ inputs.codecov-token }}
     - uses: reviewdog/action-suggester@v1
-      # `if` not supported yet?
-      # if: github.event_name == 'pull_request'
       with:
         tool_name: Documenter (doctests)
         fail_on_error: ${{ inputs.fail_on_error }}
