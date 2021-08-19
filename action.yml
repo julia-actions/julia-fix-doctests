@@ -8,13 +8,13 @@ branding:
 
 inputs:
   ### Required inputs
-  token:
-    description: 'A GitHub token with write access on your repository'
-    required: true
   package:
     description: 'Name of the package to run doctests for'
     required: true
   ### Optional inputs
+  codecov-token:
+    description: 'A CodeCov token if necessary'
+    required: false
   julia-version:
     description: 'Version of Julia to use'
     required: false
@@ -47,7 +47,7 @@ runs:
     - uses: codecov/codecov-action@v1
       with:
         file: lcov.info
-        token: ${{ token }}
+        token: ${{ codecov-token }}
     - uses: reviewdog/action-suggester@v1
       # `if` not supported yet?
       # if: github.event_name == 'pull_request'
