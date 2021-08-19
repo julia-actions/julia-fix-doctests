@@ -1,0 +1,57 @@
+name: 'doctest'
+description: 'Run doctests and make suggestions to fix them'
+author: 'Eric P. Hanson and contributors'
+
+branding:
+  icon: 'package'
+  color: 'green'
+
+inputs:
+  ### Required inputs
+  token:
+    description: 'A GitHub token with write access on your repository'
+    required: true
+  package:
+    description: 'Name of the package to run doctests for'
+    required: true
+  ### Optional inputs
+  julia-version:
+    description: 'Version of Julia to use'
+    required: false
+    default: '1'
+  fail-on-error:
+    description: 'Whether or not to fail the check if the doctests fail'
+    required: false
+    default: 'true'
+  filter_mode:
+    description: 'Look at the diff (`diff_context`) and make suggestions, or look everywhere (`nofilter`) and make annotations.'
+    required: false
+    default: 'nofilter'
+  
+runs:
+  using: 'composite'
+  steps:
+    - run: julia-actions/setup-julia@latest
+        version: ${{ inputs.julia-version }}
+    - uses: actions/checkout@v2
+    - name: Fix doctests
+      shell: julia --code-coverage --project=docs {0}
+      run: |
+        using Pkg
+        Pkg.develop(PackageSpec(path=pwd()))
+        Pkg.instantiate()
+        using Documenter, ${{ inputs.package }}
+        DocMeta.setdocmeta!(${{ inputs.package }}, :DocTestSetup, :(using ${{ inputs.package }}); recursive=true)
+        doctest(${{ inputs.package }}; fix=true)
+    - uses: julia-actions/julia-processcoverage@v1
+    - uses: codecov/codecov-action@v1
+      with:
+        file: lcov.info
+        token: ${{ token }}
+    - uses: reviewdog/action-suggester@v1
+      # `if` not supported yet?
+      # if: github.event_name == 'pull_request'
+      with:
+        tool_name: Documenter (doctests)
+        fail_on_error: ${{ inputs.fail-on-error }}
+        filter_mode: ${{ inputs.filter_mode }}
