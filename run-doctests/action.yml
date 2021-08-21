@@ -11,28 +11,15 @@ inputs:
   package:
     description: 'Name of the package to run doctests for'
     required: true
+  project:
+    description: 'Value passed to the --project flag. The default value is "docs"'
+    default: 'docs'
+    required: false
 
 runs:
   using: 'composite'
   steps:
     - name: Fix doctests
-      shell: julia --code-coverage --project=docs {0}
-      run: |
-        ENV["GITHUB_EVENT_NAME"] == "pull_request" || error("""
-        `julia-doctest` can only be run on pull requests! Use
-        ```
-        on: [pull_request]
-        ```
-        to only trigger your workflow on pull requests.
-        """)
-        using Pkg
-        Pkg.develop(PackageSpec(path=pwd()))
-        Pkg.instantiate()
-        try
-            using Documenter
-        catch e
-          rethrow(ErrorException("Documenter.jl was not found in the `docs` environment."))
-        end
-        using ${{ inputs.package }}
-        DocMeta.setdocmeta!(${{ inputs.package }}, :DocTestSetup, :(using ${{ inputs.package }}); recursive=true)
-        doctest(${{ inputs.package }}; fix=true)
+      run: julia --code-coverage --project=${{ inputs.project }} "$GITHUB_ACTION_PATH"/run_doctests.jl
+      shell: bash
+        
