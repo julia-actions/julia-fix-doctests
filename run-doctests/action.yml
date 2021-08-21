@@ -22,4 +22,6 @@ runs:
     - name: Fix doctests
       run: julia --code-coverage --project=${{ inputs.project }} "$GITHUB_ACTION_PATH"/run_doctests.jl
       shell: bash
+      env:
+        INPUT_PACKAGE: ${{ inputs.package }}
         
