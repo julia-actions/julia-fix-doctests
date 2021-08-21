@@ -63,4 +63,5 @@ end
 ##### Reset the docs Project + Manifest so that they don't show up in the diff
 #####
 
-run(`git checkout HEAD -- $(joinpath(package_path, "Project.toml")) $(joinpath(package_path, "Manifest.toml"))`)
+run(`git checkout HEAD -- $(joinpath(package_path, "Project.toml"))`)
+run(`git checkout HEAD -- $(joinpath(package_path, "Manifest.toml"))`)
