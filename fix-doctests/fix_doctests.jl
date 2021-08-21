@@ -63,15 +63,16 @@ end
 ##### Reset the docs Project + Manifest so that they don't show up in the diff
 #####
 
-# We may not be in a git repo, and one or both of these may not be committed,
-# so we will ignore errors here.
-
-try
-    run(`git checkout HEAD -- $(joinpath(package_path, "Project.toml"))`)
-catch
+function reset(file)
+    try
+        path = joinpath(project_path, file)
+        run(`git checkout HEAD -- $path`)
+        @info "Reset $path"
+    catch
+        # We may not be in a git repo, and the file may not be committed,
+        # so we will ignore errors here.
+    end
 end
 
-try
-    run(`git checkout HEAD -- $(joinpath(package_path, "Manifest.toml"))`)
-catch
-end
+reset("Project.toml")
+reset("Manifest.toml")
