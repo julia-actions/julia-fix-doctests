@@ -20,7 +20,7 @@ runs:
   using: 'composite'
   steps:
     - name: Fix doctests
-      run: julia --code-coverage --project=${{ inputs.project }} "$GITHUB_ACTION_PATH"/run_doctests.jl
+      run: julia --code-coverage --project=${{ inputs.project }} "$GITHUB_ACTION_PATH"/fix_doctests.jl
       shell: bash
       env:
         INPUT_PACKAGE_PATH: ${{ inputs.package_path }}
