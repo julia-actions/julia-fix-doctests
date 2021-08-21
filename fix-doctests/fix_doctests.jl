@@ -66,7 +66,7 @@ end
 function reset(file)
     try
         path = joinpath(project_path, file)
-        run(`git checkout HEAD -- $path`)
+        read(`git checkout HEAD -- $path`) # `read` instead of `run` to suppress output
         @info "Reset $path"
     catch
         # We may not be in a git repo, and the file may not be committed,
