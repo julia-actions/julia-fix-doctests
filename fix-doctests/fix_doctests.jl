@@ -58,3 +58,9 @@ end
     DocMeta.setdocmeta!($(name_sym), :DocTestSetup, :(using $name_sym); recursive=true)
     doctest($(name_sym); fix=true)
 end
+
+#####
+##### Reset the docs Project + Manifest so that they don't show up in the diff
+#####
+
+run(`git checkout HEAD -- $(joinpath(package_path, "Project.toml") $(joinpath(package_path, "Manifest.toml"))`)
