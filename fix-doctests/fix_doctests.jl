@@ -68,8 +68,10 @@ end
 
 try
     run(`git checkout HEAD -- $(joinpath(package_path, "Project.toml"))`)
+catch
 end
 
 try
     run(`git checkout HEAD -- $(joinpath(package_path, "Manifest.toml"))`)
+catch
 end
