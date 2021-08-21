@@ -7,11 +7,15 @@ branding:
   color: 'green'
 
 inputs:
-  ### Required inputs
-  package:
-    description: 'Name of the package to run doctests for'
-    required: true
   ### Optional inputs
+  package_path:
+    description: 'Path to the directory of the package. Only required for subdirectory packages.'
+    default: ''
+    required: false
+  project:
+    description: 'Value passed to the --project flag. The default value is "docs"'
+    default: 'docs'
+    required: false
   codecov-token:
     description: 'A CodeCov token if necessary'
     required: false
@@ -34,10 +38,25 @@ runs:
     - uses: julia-actions/setup-julia@latest
       with:
         version: ${{ inputs.julia-version }}
+    # We can't do `if` checks in composite actions yet,
+    # so we manually verify we are on a PR.
+    - name: Check PR
+      shell: julia --color=yes {0}
+      run: |
+        if ENV["GITHUB_EVENT_NAME"] != "pull_request"
+          error("""
+          `julia-doctest` can only be run on pull requests! Use
+          ```
+          on: [pull_request]
+          ```
+          to only trigger your workflow on pull requests.
+          """)
+        end
     - uses: actions/checkout@v2
-    - uses: ericphanson/julia-doctest/run-doctests@eph/init
+    - uses: ericphanson/julia-doctest/fix-doctests@eph/init
       with:
-        package: ${{ inputs.package }}
+        package_path: ${{ inputs.package_path }}
+        project: ${{ inputs.project }}
     - uses: julia-actions/julia-processcoverage@v1
     - uses: codecov/codecov-action@v1
       with:
