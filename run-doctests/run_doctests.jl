@@ -18,7 +18,7 @@ catch e
     rethrow(ErrorException("Documenter.jl was not found in the `docs` environment."))
 end
 
-MyPkg = Symbol(ENV["INPUTS_PACKAGE"])
+MyPkg = Symbol(ENV["INPUT_PACKAGE"])
 @info "Package name: $(MyPkg)"
 @eval begin
     using $(MyPkg)
