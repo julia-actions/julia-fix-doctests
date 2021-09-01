@@ -1,5 +1,5 @@
-name: 'julia-doctest'
-description: 'Run doctests and make suggestions to fix them'
+name: 'julia-fix-doctests'
+description: 'Run `doctest(MyPkg; fix=true)`'
 author: 'Eric P. Hanson and contributors'
 
 branding:
@@ -7,7 +7,6 @@ branding:
   color: 'green'
 
 inputs:
-  ### Optional inputs
   package_path:
     description: 'Path to the directory of the package. Only required for subdirectory packages.'
     default: ''
@@ -16,54 +15,15 @@ inputs:
     description: 'Value passed to the --project flag. The default value is "docs"'
     default: 'docs'
     required: false
-  codecov-token:
-    description: 'A CodeCov token if necessary'
-    required: false
-  julia-version:
-    description: 'Version of Julia to use'
-    required: false
-    default: '1'
-  fail_on_error:
-    description: 'Whether or not to fail the check if the doctests fail'
-    required: false
-    default: 'true'
-  filter_mode:
-    description: 'Look at the diff (`diff_context`) and make suggestions, or look everywhere (`nofilter`) and make annotations.'
-    required: false
-    default: 'nofilter'
-  
+
 runs:
   using: 'composite'
   steps:
-    - uses: julia-actions/setup-julia@latest
-      with:
-        version: ${{ inputs.julia-version }}
-    # We can't do `if` checks in composite actions yet,
-    # so we manually verify we are on a PR.
-    - name: Check PR
-      shell: julia --color=yes {0}
-      run: |
-        if ENV["GITHUB_EVENT_NAME"] != "pull_request"
-          error("""
-          `julia-doctest` can only be run on pull requests! Use
-          ```
-          on: [pull_request]
-          ```
-          to only trigger your workflow on pull requests.
-          """)
-        end
-    - uses: actions/checkout@v2
-    - uses: ericphanson/julia-doctest/fix-doctests@eph/init
-      with:
-        package_path: ${{ inputs.package_path }}
-        project: ${{ inputs.project }}
-    - uses: julia-actions/julia-processcoverage@v1
-    - uses: codecov/codecov-action@v1
-      with:
-        file: lcov.info
-        token: ${{ inputs.codecov-token }}
-    - uses: reviewdog/action-suggester@v1
-      with:
-        tool_name: Documenter (doctests)
-        fail_on_error: ${{ inputs.fail_on_error }}
-        filter_mode: ${{ inputs.filter_mode }}
+    - name: Fix doctests
+      run: julia --project=${{ inputs.project }} "$GITHUB_ACTION_PATH"/fix_doctests.jl
+      shell: bash
+      env:
+        INPUT_PACKAGE_PATH: ${{ inputs.package_path }}
+        INPUT_PROJECT: ${{ inputs.project }}
+
+        
